@@ -14,6 +14,8 @@
     min-height: 100vh;
     background: #0a0a0a;
     margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
   }
   
@@ -33,11 +35,12 @@
   .text-container {
     text-align: center;
     animation: shake 10s infinite;
+    margin-bottom: 20px;
   }
   
   .title {
     color: #ffffff;
-    font-size: 72px;
+    font-size: clamp(36px, 10vw, 72px);
     font-weight: 900;
     margin-bottom: 10px;
     letter-spacing: 8px;
@@ -45,7 +48,7 @@
   
   .subtitle {
     color: #cccccc;
-    font-size: 24px;
+    font-size: clamp(14px, 4vw, 24px);
     font-weight: 700;
     margin-bottom: 5px;
     letter-spacing: 3px;
@@ -53,15 +56,25 @@
   
   .tagline {
     color: #888;
-    font-size: 14px;
+    font-size: clamp(10px, 2.5vw, 14px);
     font-weight: 400;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     letter-spacing: 2px;
     text-transform: uppercase;
   }
   
+  .grid-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
   .grid-container {
     display: inline-block;
+    max-width: 95vw;
+    max-height: 60vh;
+    overflow: hidden;
   }
   
   .grid-row {
@@ -91,6 +104,40 @@
   .cell.green {
     background-color: rgb(0, 255, 0);
   }
+  
+  /* 모바일 최적화 */
+  @media (max-width: 768px) {
+    .text-container {
+      margin-bottom: 15px;
+    }
+    
+    .title {
+      letter-spacing: 4px;
+    }
+    
+    .subtitle {
+      letter-spacing: 2px;
+    }
+    
+    .tagline {
+      letter-spacing: 1px;
+    }
+    
+    .grid-container {
+      transform: scale(0.7);
+      transform-origin: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    body {
+      padding: 10px;
+    }
+    
+    .grid-container {
+      transform: scale(0.5);
+    }
+  }
 </style>
 </head>
 <body>
@@ -99,7 +146,9 @@
   <div class="subtitle">The Year of Managed Instability</div>
   <div class="tagline">One Change · Total Impact</div>
 </div>
-<div class="grid-container" id="grid"></div>
+<div class="grid-wrapper">
+  <div class="grid-container" id="grid"></div>
+</div>
 
 <script>
   const ROWS = 45;
