@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Managed Instability 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #0a0a0a;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-1px, -1px); }
+    20% { transform: translate(1px, 1px); }
+    30% { transform: translate(-1px, 1px); }
+    40% { transform: translate(1px, -1px); }
+    50% { transform: translate(-1px, -1px); }
+    60% { transform: translate(1px, 1px); }
+    70% { transform: translate(-1px, 1px); }
+    80% { transform: translate(1px, -1px); }
+    90% { transform: translate(-1px, -1px); }
+  }
+  
+  .text-container {
+    text-align: center;
+    animation: shake 10s infinite;
+  }
+  
+  .title {
+    color: #ffffff;
+    font-size: 72px;
+    font-weight: 900;
+    margin-bottom: 10px;
+    letter-spacing: 8px;
+  }
+  
+  .subtitle {
+    color: #cccccc;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    letter-spacing: 3px;
+  }
+  
+  .tagline {
+    color: #888;
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  
+  .grid-container {
+    display: inline-block;
+  }
+  
+  .grid-row {
+    display: flex;
+  }
+  
+  .cell {
+    width: 10px;
+    height: 10px;
+    border: 0.5px solid #222;
+    box-sizing: border-box;
+    transition: background-color 0.08s ease;
+  }
+  
+  .cell.white {
+    background-color: #333333;
+  }
+  
+  .cell.black {
+    background-color: #000000;
+  }
+  
+  .cell.red {
+    background-color: rgb(255, 0, 0);
+  }
+  
+  .cell.green {
+    background-color: rgb(0, 255, 0);
+  }
+</style>
+</head>
+<body>
+<div class="text-container">
+  <div class="title">2026</div>
+  <div class="subtitle">The Year of Managed Instability</div>
+  <div class="tagline">One Change · Total Impact</div>
+</div>
+<div class="grid-container" id="grid"></div>
+
+<script>
+  const ROWS = 45;
+  const COLS = 45;
+  
+  const grid = document.getElementById('grid');
+  const cells = [];
+  
+  // 44개 행 (각 45열)
+  for(let row = 0; row < ROWS - 1; row++) {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'grid-row';
+    cells[row] = [];
+    
+    for(let col = 0; col < COLS; col++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell ' + (Math.random() < 0.5 ? 'white' : 'black');
+      rowDiv.appendChild(cell);
+      cells[row][col] = cell;
+    }
+    grid.appendChild(rowDiv);
+  }
+  
+  // 마지막 행 (46열 - 트리거 셀 포함)
+  const lastRowDiv = document.createElement('div');
+  lastRowDiv.className = 'grid-row';
+  cells[ROWS - 1] = [];
+  
+  for(let col = 0; col < COLS + 1; col++) {
+    const cell = document.createElement('div');
+    if(col === COLS) {
+      cell.className = 'cell red'; // 트리거 셀은 빨강으로 시작
+    } else {
+      cell.className = 'cell ' + (Math.random() < 0.5 ? 'white' : 'black');
+    }
+    lastRowDiv.appendChild(cell);
+    cells[ROWS - 1][col] = cell;
+  }
+  grid.appendChild(lastRowDiv);
+  
+  function toggleCell(row, col) {
+    if(row < 0 || row >= ROWS) return;
+    if(col < 0) return;
+    if(row < ROWS - 1 && col >= COLS) return;
+    if(row === ROWS - 1 && col > COLS) return;
+    
+    const cell = cells[row][col];
+    
+    // 트리거 셀 (45, 46)은 적/녹 반전
+    if(row === ROWS - 1 && col === COLS) {
+      if(cell.classList.contains('red')) {
+        cell.classList.remove('red');
+        cell.classList.add('green');
+      } else {
+        cell.classList.remove('green');
+        cell.classList.add('red');
+      }
+    } else {
+      // 나머지는 흑/백 반전
+      if(cell.classList.contains('white')) {
+        cell.classList.remove('white');
+        cell.classList.add('black');
+      } else {
+        cell.classList.remove('black');
+        cell.classList.add('white');
+      }
+    }
+  }
+  
+  function generateWaveOrder() {
+    const waves = [[[ROWS - 1, COLS]]];
+    
+    const visited = Array(ROWS).fill(null).map((_, r) => {
+      const len = r < ROWS - 1 ? COLS : COLS + 1;
+      return Array(len).fill(false);
+    });
+    visited[ROWS - 1][COLS] = true;
+    
+    let currentWave = [[ROWS - 1, COLS]];
+    const dirs = [[0, -1], [-1, 0], [0, 1], [1, 0]];
+    
+    while(currentWave.length > 0) {
+      const nextWave = [];
+      
+      for(const [r, c] of currentWave) {
+        for(const [dr, dc] of dirs) {
+          const newRow = r + dr;
+          const newCol = c + dc;
+          
+          if(newRow >= 0 && newRow < ROWS && newCol >= 0) {
+            const maxCol = (newRow === ROWS - 1) ? COLS + 1 : COLS;
+            if(newCol < maxCol && !visited[newRow][newCol]) {
+              visited[newRow][newCol] = true;
+              nextWave.push([newRow, newCol]);
+            }
+          }
+        }
+      }
+      
+      if(nextWave.length > 0) {
+        waves.push(nextWave);
+        currentWave = nextWave;
+      } else {
+        break;
+      }
+    }
+    
+    return waves;
+  }
+  
+  async function animate() {
+    const waves = generateWaveOrder();
+    const waveDelay = 30;
+    
+    while(true) {
+      for(const wave of waves) {
+        for(const [row, col] of wave) {
+          toggleCell(row, col);
+        }
+        await new Promise(resolve => setTimeout(resolve, waveDelay));
+      }
+    }
+  }
+  
+  animate();
+</script>
+</body>
+</html>
